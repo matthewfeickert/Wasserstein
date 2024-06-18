@@ -31,7 +31,7 @@ jobs:
   macos-test:
     runs-on: macos-13
     steps:
-      - name: Checkout LLVM on MacOS
+      - name: Checkout LLVM on macOS
         uses: actions/checkout@v4
         with:
           repository: llvm/llvm-project
@@ -102,7 +102,7 @@ jobs:
     runs-on: macos-13
     needs: [linux-test, macos-test, windows-test]
     steps:
-      - name: Checkout LLVM on MacOS
+      - name: Checkout LLVM on macOS
         uses: actions/checkout@v4
         with:
           repository: llvm/llvm-project
