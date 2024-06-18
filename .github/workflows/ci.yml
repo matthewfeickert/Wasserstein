@@ -52,12 +52,19 @@ jobs:
     - name: Build OpenMP on macOS
       if: matrix.os == 'macos-13'
       run: |
-        cd llvm-project/openmp
-        mkdir build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(brew --prefix) -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLIBOMP_INSTALL_ALIASES=OFF /Users/runner/work/Wasserstein/Wasserstein/openmp
-        make
-        make install
+        cd llvm-project
+        cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_CXX_COMPILER=clang++ \
+          -DLIBOMP_INSTALL_ALIASES=OFF \
+          -S openmp \
+          -B build
+        cmake \
+          --build build \
+          --parallel
+        cmake --install build
         cd "$GITHUB_WORKSPACE"
 
     - name: Install dependencies
