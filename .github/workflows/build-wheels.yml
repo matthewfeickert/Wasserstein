@@ -36,6 +36,7 @@ jobs:
         with:
           repository: llvm/llvm-project
           ref: release/18.x
+
       - name: Build OpenMP on MacOS
         run: |
           cd /Users/runner/work/Wasserstein/Wasserstein/openmp
@@ -44,18 +45,23 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(brew --prefix) -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLIBOMP_INSTALL_ALIASES=OFF /Users/runner/work/Wasserstein/Wasserstein/openmp
           make
           make install
+
       - name: Checkout Wasserstein
         uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Compile and install libomp from source
         run: ./scripts/install-libomp-macos.sh
+
       - name: Install Python packages
         run: |
           python3 -m pip install --extra-index-url https://test.pypi.org/simple energyflow==1.3.3a0
           python3 -m pip install .[test] pytest
+
       - name: Test package
         run: pytest wasserstein
 
@@ -95,6 +101,7 @@ jobs:
         with:
           repository: llvm/llvm-project
           ref: release/18.x
+
       - name: Build OpenMP on MacOS
         run: |
           cd /Users/runner/work/Wasserstein/Wasserstein/openmp
@@ -103,14 +110,18 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(brew --prefix) -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLIBOMP_INSTALL_ALIASES=OFF /Users/runner/work/Wasserstein/Wasserstein/openmp
           make
           make install
+
       - name: Checkout Wasserstein
         uses: actions/checkout@v3
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
+
       - name: Compile and install libomp from source
         run: ./scripts/install-libomp-macos.sh
+
       - name: Build wheels and upload to PyPI
         run: ./scripts/build-wheels-and-upload.sh
 
