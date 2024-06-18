@@ -36,15 +36,17 @@ jobs:
         with:
           repository: llvm/llvm-project
           ref: release/18.x
+          path: llvm-project
 
       - name: Build OpenMP on MacOS
         run: |
-          cd /Users/runner/work/Wasserstein/Wasserstein/openmp
+          cd llvm-project/openmp
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(brew --prefix) -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLIBOMP_INSTALL_ALIASES=OFF /Users/runner/work/Wasserstein/Wasserstein/openmp
           make
           make install
+          cd "$GITHUB_WORKSPACE"
 
       - name: Checkout Wasserstein
         uses: actions/checkout@v4
@@ -98,15 +100,17 @@ jobs:
         with:
           repository: llvm/llvm-project
           ref: release/18.x
+          path: llvm-project
 
       - name: Build OpenMP on MacOS
         run: |
-          cd /Users/runner/work/Wasserstein/Wasserstein/openmp
+          cd llvm-project/openmp
           mkdir build
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(brew --prefix) -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLIBOMP_INSTALL_ALIASES=OFF /Users/runner/work/Wasserstein/Wasserstein/openmp
           make
           make install
+          cd "$GITHUB_WORKSPACE"
 
       - name: Checkout Wasserstein
         uses: actions/checkout@v3
