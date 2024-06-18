@@ -41,13 +41,22 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    # FIXME: Broken on modern libomp
-    - name: Install libomp on macOS
+    - name: Checkout LLVM on macOS
+      if: matrix.os == 'macos-13'
+      uses: actions/checkout@v4
+      with:
+        repository: llvm/llvm-project
+        ref: release/18.x
+
+    - name: Build OpenMP on macOS
       if: matrix.os == 'macos-13'
       run: |
-        brew search libomp
-        # brew install libomp
-        bash ./scripts/install-libomp-macos.sh
+        cd /Users/runner/work/Wasserstein/Wasserstein/openmp
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(brew --prefix) -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLIBOMP_INSTALL_ALIASES=OFF /Users/runner/work/Wasserstein/Wasserstein/openmp
+        make
+        make install
 
     - name: Install dependencies
       run: |
