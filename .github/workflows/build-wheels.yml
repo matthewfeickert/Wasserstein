@@ -115,7 +115,7 @@ jobs:
         if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
         with:
           repository: llvm/llvm-project
-          ref: release/14.x
+          ref: release/16.x
           path: llvm-project
 
       - name: Build OpenMP on macOS
