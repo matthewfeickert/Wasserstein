@@ -58,8 +58,7 @@ jobs:
         with:
           platforms: all
 
-      # v2.14 is the last to support Python 3.7
-      - uses: pypa/cibuildwheel@v2.14
+      - uses: pypa/cibuildwheel@v2.19
         env:
           CIBW_BUILD: cp${{ matrix.python }}-manylinux_*
           CIBW_ARCHS: ${{ matrix.arch }}
@@ -143,8 +142,7 @@ jobs:
 
       - uses: yezz123/setup-uv@v4
 
-      # v2.14 is the last to support Python 3.7
-      - uses: pypa/cibuildwheel@v2.14
+      - uses: pypa/cibuildwheel@v2.19
         env:
           CIBW_BUILD: ${{ matrix.build }}
           CIBW_ARCHS: ${{ matrix.arch }}
