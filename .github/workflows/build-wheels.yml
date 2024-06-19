@@ -88,25 +88,25 @@ jobs:
             arch: auto64
             build: "*"
 
-          - os: windows-2019
-            arch: auto64
-            build: "cp*"
+          # - os: windows-2019
+          #   arch: auto64
+          #   build: "cp*"
 
-          - os: windows-2019
-            arch: auto64
-            build: "pp*"
+          # - os: windows-2019
+          #   arch: auto64
+          #   build: "pp*"
 
-          - os: windows-2019
-            arch: auto32
-            build: "*"
+          # - os: windows-2019
+          #   arch: auto32
+          #   build: "*"
 
           - os: ubuntu-latest
             arch: auto64
             build: "*manylinux*"
 
-          - os: ubuntu-latest
-            arch: auto64
-            build: "*musllinux*"
+          # - os: ubuntu-latest
+          #   arch: auto64
+          #   build: "*musllinux*"
 
     steps:
       - name: Checkout LLVM on macOS
