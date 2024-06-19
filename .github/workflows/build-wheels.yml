@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python: [37, 38, 39, 310, 311, 312]
+        python: [37, 38, 39, 310, 311]
         arch: [aarch64]
     steps:
       - uses: actions/checkout@v4
