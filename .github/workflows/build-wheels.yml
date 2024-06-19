@@ -115,7 +115,7 @@ jobs:
         with:
           repository: llvm/llvm-project
           # ref is upper bound to use current default MACOSX_DEPLOYMENT_TARGET
-          ref: release/17.x
+          ref: release/14.x
           path: llvm-project
 
       - name: Build OpenMP on macOS
