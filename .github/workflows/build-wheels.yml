@@ -84,9 +84,9 @@ jobs:
             arch: auto64
             build: "*"
 
-          - os: macos-14
-            arch: auto64
-            build: "*"
+          # - os: macos-14
+          #   arch: auto64
+          #   build: "*"
 
           # - os: windows-2019
           #   arch: auto64
