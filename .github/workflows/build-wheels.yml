@@ -1,151 +1,187 @@
-name: Tests
+name: Wheels
 
 on:
+  # debug
   push:
-    # branches:
-    #   - master
+  workflow_dispatch:
+    inputs:
+      overrideVersion:
+        description: Manually force a version
+  release:
+    types:
+      - published
+  pull_request:
+    paths:
+      - .github/workflows/wheels.yml
 
-# env:
-#   PYPI: 1
-#   PYPITEST: 1
-#   TWINE_USERNAME: __token__
-#   TWINE_PASSWORD_PYPITEST: ${{ secrets.TWINE_PASSWORD_PYPITEST }}
-#   TWINE_PASSWORD_PYPI: ${{ secrets.TWINE_PASSWORD_PYPI }}
+concurrency:
+  group: wheels-${{ github.head_ref }}
+  cancel-in-progress: true
+
+env:
+  SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.event.inputs.overrideVersion }}
 
 jobs:
-  linux-test:
+  build_sdist:
+    name: Build SDist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
         with:
-          python-version: '3.9'
-      - name: Install Python packages
-        run: |
-          python3 -m pip install --extra-index-url https://test.pypi.org/simple energyflow==1.3.3a0
-          python3 -m pip install .[test] pytest
-      - name: Test package
-        run: pytest wasserstein
+          fetch-depth: 0
 
-  macos-test:
-    runs-on: macos-13
-    steps:
-      - name: Checkout LLVM on macOS
-        uses: actions/checkout@v4
+      - name: Build SDist
+        run: pipx run build --sdist
+
+      - name: Check metadata
+        run: pipx run twine check --strict dist/*.tar.gz
+
+      - uses: actions/upload-artifact@v4
         with:
-          repository: llvm/llvm-project
-          ref: release/18.x
-          path: llvm-project
+          path: dist/*
+          name: wheels-sdist
 
-      - name: Build OpenMP on macOS
-        run: |
-          cd llvm-project
-          cmake \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -DLIBOMP_INSTALL_ALIASES=OFF \
-            -S openmp \
-            -B build
-          cmake \
-            --build build \
-            --parallel
-          cmake --install build
-          cd "$GITHUB_WORKSPACE"
-
-      - name: Checkout Wasserstein
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Install Python packages
-        run: |
-          python3 -m pip install --extra-index-url https://test.pypi.org/simple energyflow==1.3.3a0
-          python3 -m pip install .[test] pytest
-
-      - name: Test package
-        run: pytest wasserstein
-
-  windows-test:
-    runs-on: windows-2019
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Install Python packages
-        run: |
-          python3 -m pip install --extra-index-url https://test.pypi.org/simple energyflow==1.3.3a0
-          python3 -m pip install .[test] pytest
-      - name: Test package
-        run: pytest wasserstein
-
-  linux-build:
+  build_arch_wheels:
+    name: ${{ matrix.python }} on ${{ matrix.arch }}
     runs-on: ubuntu-latest
-    needs: [linux-test, macos-test, windows-test]
+    strategy:
+      matrix:
+        python: [37, 38, 39, 310, 311, 312]
+        arch: [aarch64]
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
         with:
-          python-version: '3.9'
-      - name: Build wheels and upload to PyPI
-        run: ./scripts/build-wheels-and-upload.sh sdist
+          fetch-depth: 0
+          submodules: true
 
-  macos-build:
-    runs-on: macos-13
-    needs: [linux-test, macos-test, windows-test]
-    steps:
-      - name: Checkout LLVM on macOS
-        uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3.0.0
         with:
-          repository: llvm/llvm-project
-          ref: release/18.x
-          path: llvm-project
+          platforms: all
 
-      - name: Build OpenMP on macOS
-        run: |
-          cd llvm-project
-          cmake \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
-            -DCMAKE_C_COMPILER=clang \
-            -DCMAKE_CXX_COMPILER=clang++ \
-            -DLIBOMP_INSTALL_ALIASES=OFF \
-            -S openmp \
-            -B build
-          cmake \
-            --build build \
-            --parallel
-          cmake --install build
-          cd "$GITHUB_WORKSPACE"
+      - uses: pypa/cibuildwheel@v2.19
+        env:
+          CIBW_BUILD: cp${{ matrix.python }}-manylinux_*
+          CIBW_ARCHS: ${{ matrix.arch }}
 
-      - name: Checkout Wasserstein
-        uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Build wheels and upload to PyPI
-        run: ./scripts/build-wheels-and-upload.sh
-
-  windows-build:
-    runs-on: windows-2019
-    needs: [linux-test, macos-test, windows-test]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - name: Build wheels and upload to PyPI
+      - name: Verify clean directory
+        run: git diff --exit-code
         shell: bash
-        run: ./scripts/build-wheels-and-upload.sh
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          path: wheelhouse/*
+          name: wheel-aarch-${{ strategy.job-index }}
+
+  build_wheels:
+    name: ${{ matrix.build }} ${{ matrix.arch }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-13
+            arch: auto64
+            build: "*"
+
+          - os: macos-14
+            arch: auto64
+            build: "*"
+
+          - os: windows-2019
+            arch: auto64
+            build: "cp*"
+
+          - os: windows-2019
+            arch: auto64
+            build: "pp*"
+
+          - os: windows-2019
+            arch: auto32
+            build: "*"
+
+          - os: ubuntu-latest
+            arch: auto64
+            build: "*manylinux*"
+
+          - os: ubuntu-latest
+            arch: auto64
+            build: "*musllinux*"
+
+    steps:
+      - name: Checkout LLVM on macOS
+        uses: actions/checkout@v4
+        if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
+        with:
+          repository: llvm/llvm-project
+          ref: release/18.x
+          path: llvm-project
+
+      - name: Build OpenMP on macOS
+        if: matrix.os == 'macos-13' || matrix.os == 'macos-14'
+        run: |
+          cd llvm-project
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DLIBOMP_INSTALL_ALIASES=OFF \
+            -S openmp \
+            -B build
+          cmake \
+            --build build \
+            --parallel
+          cmake --install build
+          cd "$GITHUB_WORKSPACE"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: yezz123/setup-uv@v4
+
+      - uses: pypa/cibuildwheel@v2.19
+        env:
+          CIBW_BUILD: ${{ matrix.build }}
+          CIBW_ARCHS: ${{ matrix.arch }}
+
+      - name: Verify clean directory
+        run: git diff --exit-code
+        shell: bash
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          path: wheelhouse/*.whl
+          name: wheels-${{ strategy.job-index }}
+
+  upload_all:
+    name: Upload if release
+    needs: [build_wheels, build_arch_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    environment:
+      name: pypi
+      url: https://pypi.org/p/wasserstein
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+
+      - name: List all files
+        run: ls -lh dist
+
+      - name: Generate artifact attestation for sdist and wheels
+        uses: actions/attest-build-provenance@173725a1209d09b31f9d30a3890cf2757ebbff0d # v1.1.2
+        with:
+          subject-path: "dist/wasserstein-*"
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
