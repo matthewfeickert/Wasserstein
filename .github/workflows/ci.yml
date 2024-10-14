@@ -53,24 +53,24 @@ jobs:
         ref: release/18.x
         path: llvm-project
 
-    # - name: Build OpenMP on macOS
-    #   if: >-
-    #       matrix.os == 'macos-13'
-    #       || matrix.os == 'macos-latest'
-    #   env:
-    #     MACOSX_DEPLOYMENT_TARGET: "10.9"
-    #   working-directory: llvm-project
-    #   run: |
-    #     cmake \
-    #       -DCMAKE_BUILD_TYPE=Release \
-    #       -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
-    #       -DCMAKE_C_COMPILER=clang \
-    #       -DCMAKE_CXX_COMPILER=clang++ \
-    #       -DLIBOMP_INSTALL_ALIASES=OFF \
-    #       -S openmp \
-    #       -B build
-    #     cmake --build build --parallel
-    #     cmake --install build
+    - name: Build OpenMP on macOS
+      if: >-
+          matrix.os == 'macos-13'
+          || matrix.os == 'macos-latest'
+      env:
+        MACOSX_DEPLOYMENT_TARGET: "10.9"
+      working-directory: llvm-project
+      run: |
+        cmake \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_CXX_COMPILER=clang++ \
+          -DLIBOMP_INSTALL_ALIASES=OFF \
+          -S openmp \
+          -B build
+        cmake --build build --parallel
+        cmake --install build
 
     - name: Install dependencies
       run: |
@@ -87,12 +87,10 @@ jobs:
       run: |
         tree $(python -m pip show wasserstein | grep Location | awk '{print $NF}')/wasserstein
 
-    - name: Check if noomp
+    - name: Check omp
       run: |
-        python -c "import wasserstein.noomp"
-      if: >-
-          matrix.os == 'macos-13'
-          || matrix.os == 'macos-latest'
+        python -c "import wasserstein.omp"
+        python -c "import wasserstein.omp._wasserstein"
 
     - name: Test with pytest and coverage
       # FIXME: Running with coverage causes failures
