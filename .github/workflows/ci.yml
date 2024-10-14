@@ -90,6 +90,9 @@ jobs:
     - name: Check if noomp
       run: |
         python -c "import wasserstein.noomp"
+      if: >-
+          matrix.os == 'macos-13'
+          || matrix.os == 'macos-latest'
 
     - name: Test with pytest and coverage
       # FIXME: Running with coverage causes failures
