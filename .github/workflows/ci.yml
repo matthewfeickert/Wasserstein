@@ -89,6 +89,8 @@ jobs:
 
     - name: Check omp
       run: |
+        mkdir _debug
+        cd _debug
         python -c "import wasserstein.omp"
         python -c "import wasserstein.omp._wasserstein"
 
