@@ -19,10 +19,10 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     # On push events run the CI only on master by default, but run on any branch if the commit message contains '[ci all]'
-    if: >-
-      github.event_name != 'push'
-      || (github.event_name == 'push' && github.ref == 'refs/heads/master')
-      || (github.event_name == 'push' && github.ref != 'refs/heads/master' && contains(github.event.head_commit.message, '[ci all]'))
+    # if: >-
+    #   github.event_name != 'push'
+    #   || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    #   || (github.event_name == 'push' && github.ref != 'refs/heads/master' && contains(github.event.head_commit.message, '[ci all]'))
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -53,24 +53,24 @@ jobs:
         ref: release/18.x
         path: llvm-project
 
-    - name: Build OpenMP on macOS
-      if: >-
-          matrix.os == 'macos-13'
-          || matrix.os == 'macos-latest'
-      env:
-        MACOSX_DEPLOYMENT_TARGET: "10.9"
-      working-directory: llvm-project
-      run: |
-        cmake \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
-          -DCMAKE_C_COMPILER=clang \
-          -DCMAKE_CXX_COMPILER=clang++ \
-          -DLIBOMP_INSTALL_ALIASES=OFF \
-          -S openmp \
-          -B build
-        cmake --build build --parallel
-        cmake --install build
+    # - name: Build OpenMP on macOS
+    #   if: >-
+    #       matrix.os == 'macos-13'
+    #       || matrix.os == 'macos-latest'
+    #   env:
+    #     MACOSX_DEPLOYMENT_TARGET: "10.9"
+    #   working-directory: llvm-project
+    #   run: |
+    #     cmake \
+    #       -DCMAKE_BUILD_TYPE=Release \
+    #       -DCMAKE_INSTALL_PREFIX=$(brew --prefix) \
+    #       -DCMAKE_C_COMPILER=clang \
+    #       -DCMAKE_CXX_COMPILER=clang++ \
+    #       -DLIBOMP_INSTALL_ALIASES=OFF \
+    #       -S openmp \
+    #       -B build
+    #     cmake --build build --parallel
+    #     cmake --install build
 
     - name: Install dependencies
       run: |
@@ -82,6 +82,14 @@ jobs:
 
     - name: List installed Python packages
       run: python -m pip list
+
+    - name: Show wasserstein directory structure
+      run: |
+        tree $(python -m pip show wasserstein | grep Location | awk '{print $NF}')/wasserstein
+
+    - name: Check if noomp
+      run: |
+        python -c "import wasserstein.noomp"
 
     - name: Test with pytest and coverage
       # FIXME: Running with coverage causes failures
