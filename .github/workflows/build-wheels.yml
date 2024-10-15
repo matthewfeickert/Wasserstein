@@ -94,7 +94,7 @@ jobs:
             arch: auto64
             build: "*"
 
-          - os: windows-2019
+          - os: windows-latest
             arch: auto64
             build: "cp*"
 
