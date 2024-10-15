@@ -101,7 +101,7 @@ version = "${version}"
 '''
 
 [tool.cibuildwheel]
-skip = "pp* *musllinux*"
+skip = "pp* *musllinux* cp313-*"
 test-skip = "*i686 *win32"
 before-test = "pip install git+https://github.com/thaler-lab/EnergyFlow.git"
 test-command = "pytest {package}"
