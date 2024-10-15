@@ -97,10 +97,6 @@ jobs:
             arch: auto64
             build: "cp*"
 
-          - os: windows-2019
-            arch: auto32
-            build: "*"
-
           - os: ubuntu-latest
             arch: auto64
             build: "*manylinux*"
