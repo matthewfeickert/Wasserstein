@@ -37,18 +37,12 @@ $$  /   \$$ |\$$$$$$$ |$$$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |      $$$$$$$  |  \$$$$
 ------------------------------------------------------------------------
 """
 
-# basic package info
-__author__  = 'Patrick T. Komiske III'
-__email__   = 'pkomiske@gmail.com'
-__license__ = 'GPLv3'
-__version__ = '1.1.0'
-
 from wasserstein import config
 from wasserstein.config import *
+from wasserstein._version import version as __version__
 
 # these are all attributes of wasserstein submodule that should be top-level visible
 __all__ = [
-
     # primary functionality with variable dtype
     'EMD', 'EMDYPhi',
     'PairwiseEMD', 'PairwiseEMDYPhi',
@@ -109,9 +103,6 @@ def __dir__():
     return __all__ + [
         'wasserstein',
         'config',
-        '__author__',
-        '__email__',
-        '__license__',
         '__version__',
         '__doc__',
         '__name__',

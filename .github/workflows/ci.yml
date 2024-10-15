@@ -37,6 +37,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      # Need full history to avoid EnergyFlow dependency installing wasserstein
+      # from PyPI
+      with:
+        fetch-depth: 0
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
