@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------
+# ------------------------------------------------------------------------
 # This file is part of Wasserstein, a C++ library with a Python wrapper
 # that computes the Wasserstein/EMD distance. If you use it for academic
 # research, please cite or acknowledge the following works:
@@ -23,33 +23,37 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#------------------------------------------------------------------------
+# ------------------------------------------------------------------------
 
+# TODO: Remove this file in wasserstein v1.2.0
 import platform
 import warnings
 
-__all__ = ['with_openmp', 'without_openmp', 'openmp']
+__all__ = ["with_openmp", "without_openmp", "openmp"]
 
 # use openmp by default
 _CAN_SET_OPENMP = _USE_WITH_OPENMP = True
+
 
 def with_openmp():
     global _USE_WITH_OPENMP
     if _CAN_SET_OPENMP:
         _USE_WITH_OPENMP = True
     elif not _USE_WITH_OPENMP:
-        raise RuntimeError('already loaded without OpenMP, cannot change now')
+        raise RuntimeError("already loaded without OpenMP, cannot change now")
+
 
 def without_openmp():
-    if platform.system() != 'Darwin':
-        #raise RuntimeError('cannot opt-out of OpenMP on {}'.format(platform.system()))
-        warnings.warn('cannot opt-out of OpenMP on {}'.format(platform.system()))
+    if platform.system() != "Darwin":
+        # raise RuntimeError('cannot opt-out of OpenMP on {}'.format(platform.system()))
+        warnings.warn(f"cannot opt-out of OpenMP on {platform.system()}")
 
     global _USE_WITH_OPENMP
     if _CAN_SET_OPENMP:
         _USE_WITH_OPENMP = False
     elif _USE_WITH_OPENMP:
-        raise RuntimeError('already loaded with OpenMP, cannot change now')
+        raise RuntimeError("already loaded with OpenMP, cannot change now")
+
 
 def openmp():
     return _USE_WITH_OPENMP
