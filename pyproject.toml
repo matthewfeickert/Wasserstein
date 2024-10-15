@@ -114,4 +114,4 @@ before-test = [
     "pip list",
 ]
 test-command = "pytest {package}"
-test-requires = ["pytest", "numpy", "pot", "energyflow"]
+test-requires = ["pytest", "pot", "energyflow"]
