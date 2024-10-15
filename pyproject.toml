@@ -104,7 +104,7 @@ version = "${version}"
 build-frontend = "build[uv]"
 skip = "pp* *musllinux* cp313-*"
 test-skip = "*i686 *win32"
-# Avoid EnergyFlow installing a version of wasserstein from PyPI
+# FIXME: Avoid EnergyFlow installing a version of wasserstein from PyPI
 # Install all of EnergyFlow's dependencies except wasserstein in advance
 # h5py 3.11.0 is missing aarch64 wheels
 before-test = [
@@ -114,7 +114,7 @@ before-test = [
     "pip list",
 ]
 test-command = "pytest {package}"
+# test-requires = ["pytest", "pot", "energyflow"]
 # FIXME: Until energyflow v1.3.5 is released will need to guard h5py from
 # being upgraded to h5py 3.11.0 and use the pre-release energyflow
-# test-requires = ["pytest", "pot", "energyflow", "h5py!=3.11.0"]
 test-requires = ["pytest", "pot", "git+https://github.com/thaler-lab/EnergyFlow.git", "h5py!=3.11.0"]
