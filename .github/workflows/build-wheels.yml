@@ -142,7 +142,7 @@ jobs:
 
       # c.f. https://cibuildwheel.pypa.io/en/v2.21.3/faq/#macos-building-cpython-38-wheels-on-arm64
       - uses: actions/setup-python@v5
-        if: matrix.os == 'macos-14'
+        if: runner.os == 'macOS'
         with:
           python-version: 3.8
 
