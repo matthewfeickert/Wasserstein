@@ -103,6 +103,6 @@ version = "${version}"
 [tool.cibuildwheel]
 skip = "pp* *musllinux*"
 test-skip = "*i686 *win32"
-before-test = "pip install cython; pip install git+https://github.com/thaler-lab/EnergyFlow.git"
+before-test = "pip install git+https://github.com/thaler-lab/EnergyFlow.git"
 test-command = "pytest {package}"
 test-requires = ["pytest", "numpy", "pot", "energyflow"]
