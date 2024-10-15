@@ -108,6 +108,6 @@ test-skip = "*i686 *win32 cp37-win* cp38-win* cp39-win*"
 # Avoid EnergyFlow installing a version of wasserstein from PyPI
 # Install all of EnergyFlow's dependencies except wasserstein in advance
 # h5py 3.11.0 is missing aarch64 wheels
-before-test = "pip install h5py!=3.11.0; pip install importlib-metadata>=1.4.0; pip install --no-deps git+https://github.com/thaler-lab/EnergyFlow.git"
+before-test = "pip install h5py!=3.11.0; pip install importlib-metadata>=1.4.0; pip install --no-deps git+https://github.com/thaler-lab/EnergyFlow.git; pip list"
 test-command = "pytest {package}"
 test-requires = ["pytest", "numpy", "pot", "energyflow"]
