@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------
+# ------------------------------------------------------------------------
 # This file is part of Wasserstein, a C++ library with a Python wrapper
 # that computes the Wasserstein/EMD distance. If you use it for academic
 # research, please cite or acknowledge the following works:
@@ -23,18 +23,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-#------------------------------------------------------------------------
+# ------------------------------------------------------------------------
 
 import wasserstein.config
 
-if wasserstein.config.openmp():
-	from wasserstein.omp._wasserstein import *
-else:
-	from wasserstein.noomp._wasserstein import *
+# cvar acts as a container for all the SWIG global variables
+# c.f. https://www.swig.org/Doc4.2/SWIG.html#SWIG_nn11
+from wasserstein.omp._wasserstein import cvar
+from wasserstein.omp._wasserstein import *
 
 # check that openmp selection is consistent
 if wasserstein.config.openmp() != cvar.COMPILED_WITH_OPENMP:
-	raise ImportError('OpenMP mismatch in compiled C-extension')
+    raise ImportError("OpenMP mismatch in compiled C-extension")
 
 # can no longer change openmp preferences
 wasserstein.config._CAN_SET_OPENMP = False
