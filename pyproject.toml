@@ -103,8 +103,7 @@ version = "${version}"
 [tool.cibuildwheel]
 build-frontend = "build[uv]"
 skip = "pp* *musllinux* cp313-*"
-# skip Python 3.7,3.8,3.9 on Windows given h5py wheel issues with EnergyFlow
-test-skip = "*i686 *win32 cp37-win* cp38-win* cp39-win*"
+test-skip = "*i686 *win32"
 # Avoid EnergyFlow installing a version of wasserstein from PyPI
 # Install all of EnergyFlow's dependencies except wasserstein in advance
 # h5py 3.11.0 is missing aarch64 wheels
