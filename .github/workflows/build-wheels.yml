@@ -1,24 +1,123 @@
-name: Builds
+name: wheels
 
 on:
   push:
     branches:
       - master
+  pull_request:
+    paths:
+      - .github/workflows/wheels.yml
   workflow_dispatch:
+    inputs:
+      overrideVersion:
+        description: Manually force a version
+  release:
+    types:
+      - published
+
+concurrency:
+  group: wheels-${{ github.head_ref }}
+  cancel-in-progress: true
+
+env:
+  SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.event.inputs.overrideVersion }}
 
 jobs:
-  builds:
-    name: ${{ matrix.os }} build
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-22.04
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Build sdist
+        run: pipx run build --sdist
+
+      - name: Check metadata
+        run: pipx run twine check --strict dist/*.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: dist/*
+          name: wheels-sdist
+
+  build_arch_wheels:
+    name: ${{ matrix.python }} on ${{ matrix.arch }}
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python: ["37", "38", "39", "310", "311", "312"]
+        arch: [aarch64]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - uses: docker/setup-qemu-action@v3.2.0
+        with:
+          platforms: all
+
+      - uses: pypa/cibuildwheel@v2.21
+        env:
+          CIBW_BUILD: cp${{ matrix.python }}-manylinux_*
+          CIBW_ARCHS: ${{ matrix.arch }}
+
+      - name: Verify clean directory
+        run: git diff --exit-code
+        shell: bash
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          path: wheelhouse/*
+          name: wheels-aarch-${{ strategy.job-index }}
+
+  build_wheels:
+    name: ${{ matrix.build }} ${{ matrix.arch }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13, macos-latest]
+        include:
+          - os: macos-13
+            arch: auto64
+            build: "*"
+
+          - os: macos-14
+            arch: auto64
+            build: "*"
+
+          - os: windows-2019
+            arch: auto64
+            build: "cp*"
+
+          - os: windows-2019
+            arch: auto64
+            build: "pp*"
+
+          - os: windows-2019
+            arch: auto32
+            build: "*"
+
+          - os: ubuntu-latest
+            arch: auto64
+            build: "*manylinux*"
+
+          - os: ubuntu-latest
+            arch: auto64
+            build: "*musllinux*"
+
     steps:
       - name: Checkout LLVM on macOS
         if: >-
             matrix.os == 'macos-13'
-            || matrix.os == 'macos-latest'
+            || matrix.os == 'macos-14'
         uses: actions/checkout@v4
         with:
           repository: llvm/llvm-project
@@ -28,7 +127,7 @@ jobs:
       - name: Build OpenMP on macOS
         if: >-
             matrix.os == 'macos-13'
-            || matrix.os == 'macos-latest'
+            || matrix.os == 'macos-14'
         env:
           MACOSX_DEPLOYMENT_TARGET: "10.9"
         working-directory: llvm-project
@@ -44,14 +143,62 @@ jobs:
           cmake --build build --parallel
           cmake --install build
 
-      - name: Checkout Wasserstein repo
+      - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
 
-      - name: cibw-wheel
-        uses: pypa/cibuildwheel@v2.21
+      - uses: astral-sh/setup-uv@v3
 
-      - name: Upload wheels to GH
+      # - uses: actions/setup-python@v5
+      #   if: matrix.os == 'macos-14'
+      #   with:
+      #     python-version: 3.8
+
+      - uses: pypa/cibuildwheel@v2.21
+        env:
+          CIBW_BUILD: ${{ matrix.build }}
+          CIBW_ARCHS: ${{ matrix.arch }}
+
+      - name: Verify clean directory
+        run: git diff --exit-code
+        shell: bash
+
+      - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}
           path: wheelhouse/*.whl
+          name: wheels-${{ strategy.job-index }}
+
+  upload_all:
+    name: Upload if release
+    needs: [build_wheels, build_arch_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    environment:
+      name: pypi
+      url: https://pypi.org/p/Wasserstein
+    permissions:
+      id-token: write
+      attestations: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          merge-multiple: true
+          path: dist
+
+      - name: List all files
+        run: ls -lh dist
+
+      - name: Generate artifact attestation for sdist and wheels
+        uses: actions/attest-build-provenance@6149ea5740be74af77f260b9db67e633f6b0a9a1 # v1.4.2
+        with:
+          subject-path: "dist/wasserstein-*"
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
+          attestations: true
