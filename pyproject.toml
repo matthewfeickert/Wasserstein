@@ -114,4 +114,6 @@ before-test = [
     "pip list",
 ]
 test-command = "pytest {package}"
-test-requires = ["pytest", "pot", "energyflow"]
+# FIXME: Until energyflow v1.3.5 is released will need to guard h5py from
+# being upgraded to h5py 3.11.0
+test-requires = ["pytest", "pot", "energyflow", "h5py!=3.11.0"]
