@@ -113,4 +113,4 @@ test-command = "pytest {package}"
 # h5py 3.11.0 is missing aarch64 wheels
 # test-requires = ["pytest", "numpy", "pot", "energyflow", "h5py!=3.11.0"]
 # DEBUG: remove energyflow as already installed
-test-requires = ["pytest", "numpy", "pot", "h5py!=3.11.0"]
+test-requires = ["pytest", "numpy", "pot", "h5py!=3.11.0", "git+https://github.com/thaler-lab/EnergyFlow.git"]
