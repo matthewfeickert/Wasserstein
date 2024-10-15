@@ -101,6 +101,7 @@ version = "${version}"
 '''
 
 [tool.cibuildwheel]
+build-frontend = "build[uv]"
 skip = "pp* *musllinux* cp313-*"
 # skip Python 3.7,3.8 on Windows given h5py wheel issues with EnergyFlow
 test-skip = "*i686 *win32 cp37-win* cp38-win*"
