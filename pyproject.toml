@@ -109,12 +109,9 @@ test-skip = "*i686 *win32"
 # h5py 3.11.0 is missing aarch64 wheels
 before-test = [
     "pip list",
-    "pip install h5py!=3.11.0 importlib-metadata>=1.4.0",
+    "pip install h5py!=3.11.0 importlib-metadata>=1.4.0 numpy>=1.17.0",
     "pip install --no-deps git+https://github.com/thaler-lab/EnergyFlow.git",
     "pip list",
 ]
 test-command = "pytest {package}"
-# h5py 3.11.0 is missing aarch64 wheels
-test-requires = ["pytest", "numpy", "pot", "energyflow", "h5py!=3.11.0"]
-# DEBUG: remove energyflow as already installed
-# test-requires = ["pytest", "numpy", "pot", "h5py!=3.11.0", "git+https://github.com/thaler-lab/EnergyFlow.git"]
+test-requires = ["pytest", "numpy", "pot", "energyflow"]
