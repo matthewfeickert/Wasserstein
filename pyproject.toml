@@ -103,6 +103,8 @@ version = "${version}"
 [tool.cibuildwheel]
 skip = "pp* *musllinux* cp313-*"
 test-skip = "*i686 *win32"
-before-test = "pip install git+https://github.com/thaler-lab/EnergyFlow.git"
+# Avoid EnergyFlow installing a version of wasserstein from PyPI
+# Install all of EnergyFlow's dependencies except wasserstein in advance
+before-test = "pip install h5py; pip install importlib-metadata>=1.4.0; pip install --no-deps git+https://github.com/thaler-lab/EnergyFlow.git"
 test-command = "pytest {package}"
 test-requires = ["pytest", "numpy", "pot", "energyflow"]
