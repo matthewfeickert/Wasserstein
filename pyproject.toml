@@ -120,6 +120,7 @@ before-test = [
 test-requires = ["pytest", "pot", "git+https://github.com/thaler-lab/EnergyFlow.git", "h5py!=3.11.0"]
 environment-pass = ["SETUPTOOLS_SCM_PRETEND_VERSION"]
 environment.PIP_ONLY_BINARY = "numpy"
-environment.PIP_PREFER_BINARY = "1"
+# FIXME: Needs energyflow v1.3.5 to avoid h5py 3.11.0
+# environment.PIP_PREFER_BINARY = "1"
 # DEBUG
 build-verbosity = 3
