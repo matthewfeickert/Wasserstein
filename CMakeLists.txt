@@ -12,6 +12,9 @@ set(CMAKE_CXX_STANDARD 14
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# try this given https://github.com/orgs/scikit-build/discussions/1068#discussioncomment-8530875
+set(Python_SOABI ${SKBUILD_SOABI})
+
 # Linking to OpenMP will be outside the source tree, so include it in INSTALL_RPATH anyway
 # Repair steps will bundle it as needed.
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
