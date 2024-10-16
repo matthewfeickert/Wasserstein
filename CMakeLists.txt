@@ -2,14 +2,11 @@ cmake_minimum_required(VERSION 3.20...3.31)
 # 3.20 is the minimum requirement for LLVM
 # https://www.llvm.org/docs/CMake.html#quick-start
 
-project(
-        ${SKBUILD_PROJECT_NAME}
+project(${SKBUILD_PROJECT_NAME}
 	VERSION ${SKBUILD_PROJECT_VERSION}
 	LANGUAGES CXX)
 
-set(
-	CMAKE_CXX_STANDARD
-	14
+set(CMAKE_CXX_STANDARD 14
 	CACHE STRING "The C++ standard to compile with, 14+")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -18,12 +15,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Repair steps will bundle it as needed.
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
-find_package(
-	OpenMP
-	REQUIRED)
+find_package(OpenMP REQUIRED)
 
-find_package(
-	Python
+find_package(Python
 	COMPONENTS Interpreter Development.Module NumPy
 	REQUIRED)
 
@@ -37,7 +31,7 @@ set_property(SOURCE "src/wasserstein/swig/wasserstein.i" PROPERTY CPLUSPLUS ON)
 set_property(SOURCE "src/wasserstein/swig/wasserstein.i" PROPERTY SWIG_MODULE_NAME wasserstein)
 swig_add_library(
 	wasserstein
-        TYPE MODULE
+	TYPE MODULE
 	LANGUAGE python
 	SOURCES "src/wasserstein/swig/wasserstein.i")
 set_property(TARGET wasserstein PROPERTY SWIG_COMPILE_OPTIONS -fastproxy -w511 -keyword)
