@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.20...3.31)
 # 3.20 is the minimum requirement for LLVM
 # https://www.llvm.org/docs/CMake.html#quick-start
 
-project(${SKBUILD_PROJECT_NAME}
+project(
+	${SKBUILD_PROJECT_NAME}
 	VERSION ${SKBUILD_PROJECT_VERSION}
 	LANGUAGES CXX)
 
@@ -17,15 +18,17 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 find_package(OpenMP REQUIRED)
 
-find_package(Python
+find_package(
+	Python
 	COMPONENTS Interpreter Development.Module NumPy
 	REQUIRED)
 
 set(UseSWIG_MODULE_VERSION 2)
-find_package(SWIG REQUIRED)
+find_package(
+  SWIG
+  COMPONENTS python
+  REQUIRED)
 include(UseSWIG)
-
-message(STATUS "Working directory is ${CMAKE_CURRENT_SOURCE_DIR}")
 
 set_property(SOURCE "src/wasserstein/swig/wasserstein.i" PROPERTY CPLUSPLUS ON)
 set_property(SOURCE "src/wasserstein/swig/wasserstein.i" PROPERTY SWIG_MODULE_NAME wasserstein)
@@ -33,6 +36,7 @@ swig_add_library(
 	wasserstein
 	TYPE MODULE
 	LANGUAGE python
+	OUTPUT_DIR "${SKBUILD_PLATLIB_DIR}"
 	SOURCES "src/wasserstein/swig/wasserstein.i")
 set_property(TARGET wasserstein PROPERTY SWIG_COMPILE_OPTIONS -fastproxy -w511 -keyword)
 set_property(TARGET wasserstein PROPERTY SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON)
@@ -49,7 +53,7 @@ endif()
 
 target_link_libraries(
 	wasserstein
-	PUBLIC
+	PRIVATE
 	OpenMP::OpenMP_CXX
 	Python::Module
 	Python::NumPy)
