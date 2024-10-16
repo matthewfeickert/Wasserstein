@@ -80,6 +80,8 @@ jobs:
           name: wheels-aarch-${{ strategy.job-index }}
 
   build_wheels:
+    # Use auto64 to select CIBW_ARCHS
+    # c.f. https://cibuildwheel.pypa.io/en/stable/options/#archs
     name: ${{ matrix.build }} ${{ matrix.arch }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
