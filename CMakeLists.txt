@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20...3.29)
+cmake_minimum_required(VERSION 3.20...3.31)
 # 3.20 is the minimum requirement for LLVM
 # https://www.llvm.org/docs/CMake.html#quick-start
 
