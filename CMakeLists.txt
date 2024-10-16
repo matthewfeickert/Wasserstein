@@ -47,12 +47,10 @@ target_compile_options(wasserstein PUBLIC -ffast-math -fPIC)
 
 message(STATUS "Working directory is ${CMAKE_CURRENT_SOURCE_DIR}")
 
-if(WIN32)
-	set_property(TARGET wasserstein
-		PROPERTY SUFFIX ".${Python_SOABI}.pyd")
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set_property (TARGET ${name} PROPERTY SUFFIX ".${SKBUILD_SOABI}.pyd")
 else()
-	set_property(TARGET wasserstein
-		PROPERTY SUFFIX ".${Python_SOABI}${CMAKE_SHARED_MODULE_SUFFIX}")
+    set_property (TARGET ${name} PROPERTY SUFFIX ".${SKBUILD_SOABI}${CMAKE_SHARED_MODULE_SUFFIX}")
 endif()
 
 target_link_libraries(
