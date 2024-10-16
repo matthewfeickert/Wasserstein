@@ -123,5 +123,3 @@ environment-pass = ["SETUPTOOLS_SCM_PRETEND_VERSION"]
 # FIXME: Needs energyflow v1.3.5 to avoid h5py 3.11.0
 # environment.PIP_ONLY_BINARY = "numpy"
 # environment.PIP_PREFER_BINARY = "1"
-# DEBUG
-build-verbosity = 3
