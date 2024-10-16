@@ -118,6 +118,8 @@ before-test = [
 # FIXME: Until energyflow v1.3.5 is released will need to guard h5py from
 # being upgraded to h5py 3.11.0 and use the pre-release energyflow
 test-requires = ["pytest", "pot", "git+https://github.com/thaler-lab/EnergyFlow.git", "h5py!=3.11.0"]
+environment-pass = ["SETUPTOOLS_SCM_PRETEND_VERSION"]
+environment.PIP_ONLY_BINARY = "numpy"
 environment.PIP_PREFER_BINARY = "1"
 # DEBUG
 build-verbosity = 3
