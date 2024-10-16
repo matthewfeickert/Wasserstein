@@ -105,7 +105,6 @@ build-frontend = "build[uv]"
 test-extras = "test"
 test-command = "pytest {project}/tests"
 skip = "pp* *musllinux* cp313-*"
-test-skip = "*i686 *win32"
 # FIXME: Avoid EnergyFlow installing a version of wasserstein from PyPI
 # Install all of EnergyFlow's dependencies except wasserstein in advance
 # h5py 3.11.0 is missing aarch64 wheels
