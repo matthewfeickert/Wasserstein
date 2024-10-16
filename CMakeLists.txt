@@ -41,7 +41,6 @@ swig_add_library(
 set_property(TARGET wasserstein PROPERTY SWIG_COMPILE_OPTIONS -fastproxy -w511 -keyword)
 set_property(TARGET wasserstein PROPERTY SWIG_USE_TARGET_INCLUDE_DIRECTORIES ON)
 target_include_directories(wasserstein PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-target_compile_options(wasserstein PUBLIC -ffast-math -fPIC)
 
 message(STATUS "Working directory is ${CMAKE_CURRENT_SOURCE_DIR}")
 
