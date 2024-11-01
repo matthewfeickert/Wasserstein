@@ -102,6 +102,9 @@ version = "${version}"
 '''
 
 [tool.cibuildwheel]
+build-frontend = "build[uv]"
+test-extras = "test"
+test-command = "pytest {project}/tests"
 skip = "pp* *musllinux* cp313-*"
 before-test = "pip install cython"
 test-command = "pytest {package}"
