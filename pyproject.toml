@@ -102,7 +102,6 @@ version = "${version}"
 '''
 
 [tool.cibuildwheel]
-build-frontend = "build[uv]"
 skip = "pp* *musllinux* cp313-*"
 before-test = "pip install cython"
 test-extras = "test"
@@ -110,3 +109,7 @@ test-command = "pytest {project}/tests"
 test-requires = ["pytest", "numpy", "pot", "energyflow"]
 environment.PIP_ONLY_BINARY = "numpy"
 environment.PIP_PREFER_BINARY = "1"
+
+[tool.cibuildwheel.linux]
+# FIXME: Currently have issues with macOS and Windows.
+build-frontend = "build[uv]"
