@@ -113,3 +113,5 @@ environment.PIP_PREFER_BINARY = "1"
 [tool.cibuildwheel.linux]
 # FIXME: Currently have issues with macOS and Windows.
 build-frontend = "build[uv]"
+# Avoid the manylinux_i686 builds failing on h5py sdist builds that need libhdf5
+before-all = "yum install -y hdf5"
